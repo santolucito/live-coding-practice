@@ -1,0 +1,15 @@
+to control volume/brightness on chromebook
+
+'search'+system keys
+
+to start tidal
+
+scide
+SuperDirt.start
+
+tidalvim filename.tidal
+
+to navigate tmux
+
+ctrl+a, arrow keys
+ctrl+a, x -> close tmux screen

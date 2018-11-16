@@ -1,0 +1,11 @@
+d1 $ sound "bd:3 sn"  # vowel "o"
+
+d2 $ sound "hh hh hh hh" # hresonance 0.5 # nudge "[0 0.03]*2"
+
+--d3 $ (sound $ every 4 (fast 4) ("arpy/2 [hh hh hh]")) # nudge "[0 0.04]*4"
+
+d3 $ (sound $ ("arpy/2 [hh hh hh]")) # nudge "[0 0.04]*4"
+
+d1 silence
+
+hush

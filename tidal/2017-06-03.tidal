@@ -1,0 +1,16 @@
+d1 $ sound "pad:4" # vowel "i" # gain "0.7"
+
+hihat = "808:1" :: Pattern String
+
+d2 $ sound $ "808:1 [ 808:2*2] [808ht:3]"
+
+d4 $ sound $ "808bd:1"
+
+d3 $ slow 4 $ sound $ "rave"
+
+d3 $ silence 
+
+d5 $ sound "[arpy*4] arpy arpy:2" # vowel "o" 
+
+hush
+
