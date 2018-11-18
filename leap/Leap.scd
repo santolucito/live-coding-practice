@@ -1,40 +1,52 @@
-s.boot;
 
 (
-SynthDef( \sin, { | amp = 0.01, freq = 333, trig = 1 |
-    var env, sig;
-    env = EnvGen.kr( Env.asr( 0.001, 0.9, 0.001 ), trig, doneAction: 0 );
-    sig = LFTri.ar( [ freq, freq * 0.999 ], 0.0, amp ) * env;
-    Out.ar( [ 0 ], sig * 0.6 );
-}).add;
+s.boot;
 
-h = Synth( \sin, [ \amp, 0.4 ] );
+s.waitForBoot(
 
-x = OSCFunc( { | msg, time, addr, port |
-    var pyFreq;
-
-    pyFreq = msg[1].asFloat;
-    ( "freq is " + pyFreq ).postln;
-    h.set( \freq, pyFreq );
-}, '/swipeSpeed' );
+	{
+		SynthDef( \sin, { | amp = 0.01, freq = 333, trig = 1 |
+			var env, sig;
+			env = EnvGen.kr( Env.asr( 0.001, 0.9, 0.001 ), trig, doneAction: 0 );
+			sig = LFTri.ar( [ freq, freq * 0.999 ], 0.0, amp ) * env;
+			Out.ar( [ 0 ], sig * 0.6 );
+		}).add;
 
 
+		x = OSCFunc( { | msg, time, addr, port |
+			var pyFreq;
 
-OSCFunc( { | msg, time, addr, port |
-    var pinch;
+			pyFreq = msg[1].asFloat;
+			( "freq is " + pyFreq ).postln;
+			h.set( \freq, pyFreq );
+		}, '/swipeSpeed' );
 
-    pinch = msg[1].asFloat;
-    ( "Pinch Strength: " + pinch).postln;
 
-	h.set( \amp, (pinch-1).abs);
-}, '/pinch' );
 
-OSCFunc( { | msg, time, addr, port |
-    var keytap;
+		OSCFunc( { | msg, time, addr, port |
+			var pinch;
 
-    keytap = msg[1].asFloat;
-    ( "Keytapped: " + keytap).postln;
+			pinch = msg[1].asFloat;
+			( "Pinch Strength: " + pinch).postln;
 
-	h.set( \amp, (keytap-1).abs);
-}, '/keytap' );
+			h.set( \amp, (pinch-1).abs);
+		}, '/pinch' );
+
+		OSCFunc( { | msg, time, addr, port |
+			var keytap;
+
+			keytap = msg[1].asFloat;
+			( "Keytapped: " + keytap).postln;
+
+			h.set( \amp, (keytap-1).abs);
+		}, '/keytap' );
+
+		//we need to wait for the synthdefs to be added before we can start
+		2.sleep();
+
+		h = Synth( \sin, [ \amp, 0.4 ] );
+
+});
+
 )
+
