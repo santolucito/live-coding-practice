@@ -11,12 +11,13 @@ sys.path.append("/usr/lib/Leap")
 sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
 sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
 import Leap
-from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
+from Leap import Finger, Bone
 
 import OSC
 
 ampState = 0
 ampStateSetAt = 0
+enable_osc = False
 
 class SampleListener(Leap.Listener):
     finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
@@ -47,70 +48,41 @@ class SampleListener(Leap.Listener):
     def on_exit(self, controller):
         print "Exited"
 
+    def sendOSC(self, header, content):
+        if enable_osc:
+            msg = OSC.OSCMessage()
+            msg.setAddress("/"+header)
+            msg.append(content)
+            self.osc_client.send(msg)
+
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
+        def getFBVector(whichHand,whichFinger,whichBone):
+            if whichHand=="left":
+                return frame.hands.leftmost.fingers.finger_type(whichFinger)[0].bone(whichBone).next_joint
+            if whichHand=="right":
+                return frame.hands.rightmost.fingers.finger_type(whichFinger)[0].bone(whichBone).next_joint
 
-#        print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
-              #frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures()))
+        def matchingDist(whichFinger, whichBone):
+            return getFBVector("left", whichFinger, whichBone).distance_to(getFBVector("right", whichFinger, whichBone))
 
-        # Get tools
-        for tool in frame.tools:
+        if len(frame.hands) == 2:
+            if (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 25):
+                self.sendOSC("butterfly","")
+                print ("ELEGANT BUTTERFLY")
 
-            print "  Tool id: %d, position: %s, direction: %s" % (
-                tool.id, tool.tip_position, tool.direction)
+            if (matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) < 55 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_INTERMEDIATE) < 55 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) < 55):
+                self.sendOSC("lotus","")
+                print ("FLYING LOTUS")
 
         for hand in frame.hands:
-            msg = OSC.OSCMessage()
-            msg.setAddress("/pinch")
-            msg.append(hand.pinch_strength)
-            self.osc_client.send(msg)
-            print(hand.pinch_strength)
+            self.sendOSC("pinch", hand.pinch_strength)
+            #print(hand.pinch_strength)
             
-
-        # Get gestures
-        for gesture in frame.gestures():
-            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
-                circle = CircleGesture(gesture)
-
-                # Determine clock direction using the angle between the pointable and the circle normal
-                if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/2:
-                    clockwiseness = "clockwise"
-                else:
-                    clockwiseness = "counterclockwise"
-
-            if gesture.type == Leap.Gesture.TYPE_SWIPE:
-                swipe = SwipeGesture(gesture)
-                msg = OSC.OSCMessage()
-                msg.setAddress("/swipeSpeed")
-                msg.append(swipe.speed)
-                self.osc_client.send(msg)
-                print "  Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
-                        gesture.id, self.state_names[gesture.state],
-                        swipe.position, swipe.direction, swipe.speed)
             
-            if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
-                keytap = KeyTapGesture(gesture)
-                msg = OSC.OSCMessage()
-                msg.setAddress("/keytap")
-                global ampState
-                global ampStateSetAt
-                if (frame.timestamp - ampStateSetAt> 1000000):
-                    ampStateSetAt = frame.timestamp
-                    ampState = int(not ampState)
-                    msg.append(ampState)
-                    self.osc_client.send(msg)
-                print "  Key Tap id: %d, %s, position: %s, direction: %s" % (
-                        gesture.id, self.state_names[gesture.state],
-                        keytap.position, keytap.direction )
-
-            if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
-                screentap = ScreenTapGesture(gesture)
-                print "  Screen Tap id: %d, %s, position: %s, direction: %s" % (
-                        gesture.id, self.state_names[gesture.state],
-                        screentap.position, screentap.direction )
-            
-
         #if not (frame.hands.is_empty and frame.gestures().is_empty):
             #print ""
 
