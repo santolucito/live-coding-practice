@@ -1,0 +1,25 @@
+d1 $ sound "bd:3*2 sn"  # vowel "o"
+
+d2 $ sound "hh hh hh hh" # hresonance 0.5 # nudge "[0 0.03]*2"
+
+d4 $ sound "pad" # speed 1 # vowel vs # gain 0.6
+
+vs = "y a l e"
+
+-- vary these params
+x = fmap (*6) "4 1 3 1"
+
+-- and re-evaluate this
+d3 $ (sound $ ("arpy:0* 8")) # nudge "[0 0.04]*4" # up x # vowel vs # gain 0.8
+
+--then vary params in scd reverb (vary between full wet (to hide detailed lines), and somewhat dry (to reveal detailed lines))
+
+d4 silence
+
+d1 silence
+
+d2 silence
+
+d3 silence
+
+hush
