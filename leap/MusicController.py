@@ -69,7 +69,7 @@ class SampleListener(Leap.Listener):
 
         if len(frame.hands) == 2:
             if (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 25):
-                self.sendOSC("butterfly","")
+                self.sendOSC("butterfly",1)
                 print ("ELEGANT BUTTERFLY")
 
             if (matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) < 55 and
