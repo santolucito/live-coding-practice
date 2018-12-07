@@ -1,15 +1,31 @@
-d1 $ sound "bd:3 sn"  # vowel "o"
+let bass1 = sound "bd:3 sn"  # vowel "o"
 
-d2 $ sound "tabla*4" # hresonance 0.5 # nudge "[0 0.02]"
+let bass2 = sound "bass:0 bass:1 bass:0 bd"
+
+d1 bass1
+
+t1 (anticipateIn 4) $ brak $ bass2
+
+d2 $ sound "tabla:3*4" # hresonance 0.5 # nudge "[0 0.02]"
 
 vs = "y a l e"
 
-d4 $ sound "pad" # speed 1 # vowel vs # gain 0.7
+d4 $ sound "pad:1" # speed 1 # vowel vs # gain 0.7
 
 -- vary these params
-x = fmap (*6) "2 2 1 1"
+x = fmap (+2) "1 2 2 4"
 
 -- and re-evaluate this
-d3 $ (sound $ ("juno:0* 8")) # nudge "[0 0.04]*4" # up x # vowel vs # gain 1
+d3 $ every 2 (degradeBy 0.8) $ (sound $ ("hh:1* 8")) # nudge "[0 0.04]*4" # up x # vowel vs # gain 1
+
+d3 p
+
+let nums = slow 8 $ striate 16 $ sound "numbers:0 numbers:2 numbers:3 numbers:1" # gain 1.2
+
+d5 nums
+
+d4 silence
+
+d3 silence
 
 hush
