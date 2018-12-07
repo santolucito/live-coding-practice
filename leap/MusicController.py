@@ -17,12 +17,15 @@ import OSC
 
 ampState = 0
 ampStateSetAt = 0
-enable_osc = False
+enable_osc = True
 
 class SampleListener(Leap.Listener):
     finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
     bone_names = ['Metacarpal', 'Proximal', 'Intermediate', 'Distal']
     state_names = ['STATE_INVALID', 'STATE_START', 'STATE_UPDATE', 'STATE_END']
+    lotusVal = 0
+    butterflyVal = 0
+    bigOhVal = 0
     osc_client = None
 
     def on_init(self, controller):
@@ -52,7 +55,8 @@ class SampleListener(Leap.Listener):
         if enable_osc:
             msg = OSC.OSCMessage()
             msg.setAddress("/"+header)
-            msg.append(content)
+            for c in content:
+                msg.append(c)
             self.osc_client.send(msg)
 
     def on_frame(self, controller):
@@ -66,21 +70,48 @@ class SampleListener(Leap.Listener):
 
         def matchingDist(whichFinger, whichBone):
             return getFBVector("left", whichFinger, whichBone).distance_to(getFBVector("right", whichFinger, whichBone))
+        
+        max_pinch = 0
+        max_dist_y = 0
+        max_dist_x = 0
+        for hand in frame.hands:
+            #self.sendOSC("pinch", hand.pinch_strength)
+            if (hand.pinch_strength > max_pinch):
+                max_pinch = hand.pinch_strength
+            if (hand.palm_position.y > max_dist_y):
+                max_dist_y = hand.palm_position.y
+            if (hand.palm_position.x > max_dist_x):
+                max_dist_x = hand.palm_position.x
+
+
+        max_dist_y = 1-max(0,min(1,(max_dist_y/350)-0.2))
+        max_dist_x = max(0,min(1,(max_dist_x/350)+0.2))
 
         if len(frame.hands) == 2:
-            if (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 25):
-                self.sendOSC("butterfly",1)
-                print ("ELEGANT BUTTERFLY")
+            print("T",matchingDist(Finger.TYPE_THUMB, Bone.TYPE_DISTAL))
+            print("D",matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL))
+            print("P",matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL))
 
-            if (matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) < 55 and
+            if (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 45 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) > 90 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) > 90):
+                self.butterflyVal = min(1,max(0,self.butterflyVal + ((max_dist_y-0.5)/100)))
+                self.sendOSC("butterfly",[self.butterflyVal])
+                print ("ELEGANT BUTTERFLY",self.butterflyVal)
+
+            elif (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 45 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) < 45 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) > 50):
+                self.sendOSC("bigoh",[max_dist_x,max_dist_y])
+                print ("BIGOH",max_dist_x," ",max_dist_y)
+
+            elif (matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) < 55 and
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_INTERMEDIATE) < 55 and
-                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) < 55):
-                self.sendOSC("lotus","")
-                print ("FLYING LOTUS")
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) < 55 and
+                matchingDist(Finger.TYPE_INDEX, Bone.TYPE_METACARPAL) < 55):
+                self.sendOSC("lotus",[max_dist_y])
+                print ("FLYING LOTUS",max_dist_y)
 
-        for hand in frame.hands:
-            self.sendOSC("pinch", hand.pinch_strength)
-            #print(hand.pinch_strength)
             
             
         #if not (frame.hands.is_empty and frame.gestures().is_empty):
@@ -102,7 +133,7 @@ class SampleListener(Leap.Listener):
 def main():
     # Setup a connection between SC and Py wtih OSC
     c = OSC.OSCClient()
-    c.connect(('127.0.0.1', 57120))
+    c.connect(('127.0.0.1', 57122))
 
     # Create a sample listener and controller
     listener = SampleListener()

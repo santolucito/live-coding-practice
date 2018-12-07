@@ -1,0 +1,15 @@
+d1 $ sound "bd:3 sn"  # vowel "o"
+
+d2 $ sound "tabla*4" # hresonance 0.5 # nudge "[0 0.02]"
+
+vs = "y a l e"
+
+d4 $ sound "pad" # speed 1 # vowel vs # gain 0.7
+
+-- vary these params
+x = fmap (*6) "2 2 1 1"
+
+-- and re-evaluate this
+d3 $ (sound $ ("juno:0* 8")) # nudge "[0 0.04]*4" # up x # vowel vs # gain 1
+
+hush
