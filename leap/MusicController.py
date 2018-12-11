@@ -7,9 +7,12 @@
 ################################################################################
 
 import sys, thread, time
-sys.path.append("/usr/lib/Leap")
-sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
-sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
+sys.path.append("/usr/lib/Leap") #not even sure what this is here for...
+#sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
+#sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
+sys.path.append("/home/mark/LEAPMotion/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
+sys.path.append("/home/mark/LEAPMotion/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
+
 import Leap
 from Leap import Finger, Bone
 
@@ -70,7 +73,10 @@ class SampleListener(Leap.Listener):
 
         def matchingDist(whichFinger, whichBone):
             return getFBVector("left", whichFinger, whichBone).distance_to(getFBVector("right", whichFinger, whichBone))
-        
+   
+        def moveVal(toMove, moveAmount):
+            return min(1,max(0,toMove + ((moveAmount-0.5)/100)))
+
         max_pinch = 0
         max_dist_y = 0
         max_dist_x = 0
@@ -95,7 +101,7 @@ class SampleListener(Leap.Listener):
             if (matchingDist(Finger.TYPE_THUMB,Bone.TYPE_DISTAL) < 45 and
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_DISTAL) > 90 and
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) > 90):
-                self.butterflyVal = min(1,max(0,self.butterflyVal + ((max_dist_y-0.5)/100)))
+                self.butterflyVal = moveVal(self.butterflyVal, max_dist_y)
                 self.sendOSC("butterfly",[self.butterflyVal])
                 print ("ELEGANT BUTTERFLY",self.butterflyVal)
 
@@ -109,10 +115,9 @@ class SampleListener(Leap.Listener):
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_INTERMEDIATE) < 55 and
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_PROXIMAL) < 55 and
                 matchingDist(Finger.TYPE_INDEX, Bone.TYPE_METACARPAL) < 55):
-                self.sendOSC("lotus",[max_dist_y])
-                print ("FLYING LOTUS",max_dist_y)
-
-            
+                self.lotusVal = moveVal(self.lotusVal, max_dist_y)
+                self.sendOSC("lotus",[self.lotusVal])
+                print ("FLYING LOTUS",self.lotusVal)
             
         #if not (frame.hands.is_empty and frame.gestures().is_empty):
             #print ""

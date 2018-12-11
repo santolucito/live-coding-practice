@@ -11,5 +11,5 @@ pip install pyOSC
 we need to put the leapd daemon in a loop so if it dies it comes back right away. leapd doesn't save any state, so this shouldn't be a problem.
 
    while true; do sudo leapd && break; done
-   sclang Leap.py
+   sclang Leap.scd
    python MusicController.py
