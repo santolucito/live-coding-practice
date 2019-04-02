@@ -1,0 +1,11 @@
+hush
+
+d1 $ sound "bd:3 sn"  # vowel "o"
+
+d1 $ brak $ "bass:0 bass:1 bass:0 bd"
+
+d2 $ sound "tabla:3*4" # hresonance 0.5 # nudge "[0 0.02]"
+
+d3 $ every 3 (degradeBy 0.8) $ sound "arpy([3 5 7]/4,5)" # speed 1 # gain 0.7 # n "[1 2,3]"
+
+hush
