@@ -7,9 +7,18 @@ include("SuperDirt");
 s.quit
 
 s.boot
+
 //sometimes have problems with no free buffers - this seems to fix it...
 s.options.numBuffers = 1024 * 1024;
 
+//Use this to test audio routing
+{SinOsc.ar()}.play
+
+//--------------------------//
+//                          //
+//   Testing grain synth    //
+//                          //
+//--------------------------//
 
 (
 ~sndBuf = Buffer.readChannel(s, "grainSource.wav", channels:0);
@@ -37,6 +46,12 @@ x = Synth(\reverbBus, [\sndbuf, ~sndBuf]);
 
 s.quit
 
+
+//--------------------------//
+//                          //
+//   MAIN FOR LIVE CODING   //
+//                          //
+//--------------------------//
 (
 
 ~dirt = SuperDirt.start;
@@ -55,7 +70,7 @@ s.waitForBoot(
 		SynthDef("reverbBus", { |wetdry = 0, room=0, rmix=0.5, grainX=0, grainY=0, sndbuf|
 
 			~inSig = In.ar(8, 2);
-			~reverb = MouseY.kr(0, 1) * ((1-rmix)*~inSig) + (rmix*FreeVerb.ar(~inSig,wetdry,room));
+			~reverb = MouseY.kr(0, 1) * (((1-rmix)*~inSig) + (rmix*FreeVerb.ar(~inSig,wetdry,room)));
 
 			~grainEnv = EnvGen.kr(
 				Env([0, 1, 0], [1, 1], \sin, 1),
