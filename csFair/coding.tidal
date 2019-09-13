@@ -1,0 +1,29 @@
+hush
+
+This progrmaming language is called "tidal" 
+
+d1 $ sound "bass*2 hh*4"
+
+d2 $ silence 
+
+d2 $ sound "[ht*8] hh"
+
+d4 $ "arpy:0 arpy:2*4 ~ arpy:3" # gain 1.1
+
+d4 $ silence
+
+d4 $ brak $ "bass:0 ~ [arpy:2*2 arpy:5]" 
+
+d5 $ "~ ~ [bass:0*3]"
+
+d6 $ "arpy:0"
+
+d5 $ "pad" # gain 0.6
+
+d5 $ silence
+
+d2 $ sound "tabla:3*4" # hresonance 0.5 # nudge "[0 0.02]"
+
+d3 $ every 3 (degradeBy 0.8) $ sound "arpy([3 5 7]/4,5)" # speed 1 # gain 0.7 # n "[1 2,3]"
+
+hush

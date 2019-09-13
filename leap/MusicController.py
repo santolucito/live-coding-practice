@@ -8,8 +8,8 @@
 
 import sys, thread, time
 sys.path.append("/usr/lib/Leap") #not even sure what this is here for...
-#sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
-#sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
+sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
+sys.path.append("/home/mark/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
 sys.path.append("/home/mark/LEAPMotion/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/")
 sys.path.append("/home/mark/LEAPMotion/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64")
 
